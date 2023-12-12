@@ -1,14 +1,15 @@
 import type { Container } from '../Container';
 
-export interface SortMixinConstructor
-{
+export interface SortMixinConstructor {
     zIndex?: number;
+    zOrder?: number;
     sortDirty?: boolean;
     sortableChildren?: boolean;
 }
-export interface SortMixin extends Required<SortMixinConstructor>
-{
+export interface SortMixin extends Required<SortMixinConstructor> {
     _zIndex: 0;
+    _zOrder: null;
+    _zOrderLocal: 0;
 
     sortChildren: () => void;
     depthOfChildModified: () => void;
@@ -16,6 +17,8 @@ export interface SortMixin extends Required<SortMixinConstructor>
 
 export const sortMixin: Partial<Container> = {
     _zIndex: 0,
+    _zOrder: null,
+    _zOrderLocal: 0,
     /**
      * Should children be sorted by zIndex at the next render call.
      *
@@ -48,13 +51,11 @@ export const sortMixin: Partial<Container> = {
      * @see scene.Container#sortableChildren
      * @memberof scene.Container#
      */
-    get zIndex()
-    {
+    get zIndex() {
         return this._zIndex;
     },
 
-    set zIndex(value)
-    {
+    set zIndex(value) {
         if (this._zIndex === value) return;
 
         this._zIndex = value;
@@ -62,16 +63,25 @@ export const sortMixin: Partial<Container> = {
         this.depthOfChildModified();
     },
 
-    depthOfChildModified()
-    {
-        if (this.parent)
-        {
+    get zOrder() {
+        return this._zOrder;
+    },
+
+    set zOrder(value) {
+        if (this._zOrder === value) return;
+
+        this._zOrder = value;
+
+        this.depthOfChildModified();
+    },
+
+    depthOfChildModified() {
+        if (this.parent) {
             this.parent.sortableChildren = true;
             this.parent.sortDirty = true;
         }
 
-        if (this.renderGroup && !this.isRenderGroupRoot)
-        {
+        if (this.renderGroup && !this.isRenderGroupRoot) {
             this.renderGroup.structureDidChange = true;
         }
     },
@@ -80,8 +90,7 @@ export const sortMixin: Partial<Container> = {
      * Sorts children by zIndex.
      * @memberof scene.Container#
      */
-    sortChildren()
-    {
+    sortChildren() {
         if (!this.sortDirty) return;
 
         this.sortDirty = false;
@@ -90,7 +99,6 @@ export const sortMixin: Partial<Container> = {
     },
 } as Container;
 
-function sortChildren(a: Container, b: Container): number
-{
+function sortChildren(a: Container, b: Container): number {
     return a._zIndex - b._zIndex;
 }

@@ -1,27 +1,40 @@
 {
-    "extends": ["@pixi/eslint-config"],
-    "plugins": ["import", "jsdoc", "simple-import-sort", "no-mixed-operators"],
-    "ignorePatterns": ["**/*.index.d.ts"],
-    "settings": {
-        "jsdoc": {
-            "mode": "typescript",
-            "tagNamePreference": {
-                "method": "method",
-                "function": "function",
-                "extends": "extends",
-                "typeParam": "typeParam",
-                "api": "api"
-            }
-        }
-    },
+    "extends": [
+        "@pixi/eslint-config"
+    ],
+    "plugins": [
+        "import",
+        "simple-import-sort",
+        "no-mixed-operators"
+    ],
+    "ignorePatterns": [
+        "**/*.index.d.ts"
+    ],
     "parserOptions": {
         "project": "./tsconfig.json"
     },
     "rules": {
-        "camelcase": [1, { "allow": ["^v\\d{1,}_\\d{1,}_\\d{1,}$"] }],
-        "no-multi-spaces": [1, { "exceptions": {} }],
-        "object-curly-newline": [1, { "multiline": true, "consistent": true }],
-
+        "camelcase": [
+            1,
+            {
+                "allow": [
+                    "^v\\d{1,}_\\d{1,}_\\d{1,}$"
+                ]
+            }
+        ],
+        "no-multi-spaces": [
+            1,
+            {
+                "exceptions": {}
+            }
+        ],
+        "object-curly-newline": [
+            1,
+            {
+                "multiline": true,
+                "consistent": true
+            }
+        ],
         // Imports and Exports
         "import/first": 1,
         "import/newline-after-import": 1,
@@ -48,60 +61,37 @@
             }
         ],
         "simple-import-sort/exports": 1,
-
-        "spaced-comment": [1, "always", { "markers": ["/"] }],
-        "@typescript-eslint/triple-slash-reference": [1, { "path": "always" }],
-        "@typescript-eslint/consistent-type-imports": [1, { "disallowTypeAnnotations": false }],
-        "@typescript-eslint/no-parameter-properties": 1,
-        "@typescript-eslint/type-annotation-spacing": 1,
-        "jsdoc/multiline-blocks": [1, { "noMultilineBlocks": true, "minimumLengthForMultiline": 115 }],
-        "jsdoc/check-access": 1,
-        "jsdoc/check-alignment": 1,
-        "jsdoc/check-param-names": 1,
-        "jsdoc/check-property-names": 1,
-        "jsdoc/check-tag-names": 1,
-        "jsdoc/check-types": 1,
-        "jsdoc/check-values": 1,
-        "jsdoc/empty-tags": 1,
-        "jsdoc/implements-on-classes": 1,
-        "jsdoc/newline-after-description": [1, "never"],
-        "jsdoc/no-multi-asterisks": [1, { "allowWhitespace": true }],
-        "jsdoc/no-undefined-types": [
-            "warn",
+        "spaced-comment": [
+            1,
+            "always",
             {
-                "definedTypes": [
-                    "assets",
-                    "app",
-                    "accessibility",
-                    "scene",
-                    "maths",
-                    "AddEventListenerOptions",
-                    "EventListenerOptions",
-                    "EventListenerOrEventListenerObject",
-                    "WEBGL_draw_buffers",
-                    "WEBGL_depth_texture",
-                    "OES_texture_float",
-                    "WEBGL_lose_context",
-                    "OES_vertex_array_object",
-                    "EXT_texture_filter_anisotropic"
+                "markers": [
+                    "/"
                 ]
             }
         ],
-        "jsdoc/require-param": 1,
-        "jsdoc/require-param-description": 0,
-        "jsdoc/require-param-name": 1,
-        "jsdoc/require-param-type": ["warn", { "contexts": ["TSMethodSignature"] }],
-        "jsdoc/require-property": 1,
-        "jsdoc/require-property-description": 1,
-        "jsdoc/require-property-name": 1,
-        "jsdoc/require-property-type": 1,
-        "jsdoc/require-returns-description": 1,
-        "jsdoc/require-hyphen-before-param-description": 1,
-        "jsdoc/tag-lines": 1,
-        "jsdoc/valid-types": 1,
+        "@typescript-eslint/triple-slash-reference": [
+            1,
+            {
+                "path": "always"
+            }
+        ],
+        "@typescript-eslint/consistent-type-imports": [
+            1,
+            {
+                "disallowTypeAnnotations": false
+            }
+        ],
+        "@typescript-eslint/no-parameter-properties": 1,
+        "@typescript-eslint/type-annotation-spacing": 1,
         "no-mixed-operators": "off",
         "no-mixed-operators/no-mixed-operators": 1,
-        "@typescript-eslint/no-unused-expressions": [1, { "allowShortCircuit": true }],
+        "@typescript-eslint/no-unused-expressions": [
+            1,
+            {
+                "allowShortCircuit": true
+            }
+        ],
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/prefer-readonly": "error",
         "@typescript-eslint/explicit-member-accessibility": [
@@ -117,22 +107,38 @@
                 }
             }
         ],
-        "no-void": ["error", { "allowAsStatement": true }],
+        "no-void": [
+            "error",
+            {
+                "allowAsStatement": true
+            }
+        ],
         "@typescript-eslint/naming-convention": [
             "error",
             {
                 "selector": "memberLike",
-                "modifiers": ["private"],
-                "format": ["camelCase"],
+                "modifiers": [
+                    "private"
+                ],
+                "format": [
+                    "camelCase"
+                ],
                 "leadingUnderscore": "require"
             }
         ]
     },
     "overrides": [
         {
-            "files": ["*.tests.ts", "*.test.ts"],
-            "plugins": ["jest"],
-            "extends": ["plugin:jest/recommended"],
+            "files": [
+                "*.tests.ts",
+                "*.test.ts"
+            ],
+            "plugins": [
+                "jest"
+            ],
+            "extends": [
+                "plugin:jest/recommended"
+            ],
             "globals": {
                 "expect": false,
                 "assert": false,
@@ -156,10 +162,16 @@
                 "jest/expect-expect": [
                     "error",
                     {
-                      "assertFunctionNames": ["expect", "check32BitColorMatches", "assertRemovedFromParent"],
-                      "additionalTestBlockFunctions": [""]
+                        "assertFunctionNames": [
+                            "expect",
+                            "check32BitColorMatches",
+                            "assertRemovedFromParent"
+                        ],
+                        "additionalTestBlockFunctions": [
+                            ""
+                        ]
                     }
-                  ]
+                ]
             }
         }
     ]
