@@ -3,12 +3,15 @@ import type { Container } from '../Container';
 export interface SortMixinConstructor
 {
     zIndex?: number;
+    zOrder?: number;
     sortDirty?: boolean;
     sortableChildren?: boolean;
 }
 export interface SortMixin extends Required<SortMixinConstructor>
 {
     _zIndex: 0;
+    _zOrder: number | null;
+    _zOrderLocal: number;
 
     sortChildren: () => void;
     depthOfChildModified: () => void;
@@ -16,6 +19,8 @@ export interface SortMixin extends Required<SortMixinConstructor>
 
 export const sortMixin: Partial<Container> = {
     _zIndex: 0,
+    _zOrder: null,
+    _zOrderLocal: 0,
     /**
      * Should children be sorted by zIndex at the next render call.
      *
@@ -58,6 +63,20 @@ export const sortMixin: Partial<Container> = {
         if (this._zIndex === value) return;
 
         this._zIndex = value;
+
+        this.depthOfChildModified();
+    },
+
+    get zOrder()
+    {
+        return this._zOrder;
+    },
+
+    set zOrder(value)
+    {
+        if (this._zOrder === value) return;
+
+        this._zOrder = value;
 
         this.depthOfChildModified();
     },
