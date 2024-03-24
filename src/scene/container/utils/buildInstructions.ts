@@ -32,6 +32,26 @@ export function buildInstructions(renderGroup: RenderGroup, renderPipes: RenderP
     // instructionSet.log();
 }
 
+export function getZOrderRecursive(child: Container)
+{
+    if (child._zOrder !== null && child._zOrder !== undefined && child._zOrder !== 0) return child._zOrder;
+    if (child.parent === null) return 0;
+    if (child.parent._zOrder !== null && child.parent._zOrder !== undefined) return child.parent._zOrder;
+
+    return getZOrderRecursive(child.parent);
+}
+
+export function collectChildRelative(arr: Array<Container>, container: Container)
+{
+    container.children.forEach((child) =>
+    {
+        if (child.globalDisplayStatus < 0b111 || !child.includeInBuild) return;
+        arr.push(child);
+        child._zOrderLocal = getZOrderRecursive(child);
+        collectChildRelative(arr, child);
+    });
+}
+
 export function collectAllRenderables(
     container: Container,
     instructionSet: InstructionSet,
@@ -47,17 +67,25 @@ export function collectAllRenderables(
         container.sortChildren();
     }
 
-    if (container.isSimple)
+    const allRenderables: Array<Container> = [container];
+
+    collectChildRelative(allRenderables, container);
+    allRenderables.sort((a: Container, b: Container) => a._zOrderLocal - b._zOrderLocal);
+
+    for (const child of allRenderables)
     {
-        collectAllRenderablesSimple(container, instructionSet, rendererPipes);
-    }
-    else
-    {
-        collectAllRenderablesAdvanced(container, instructionSet, rendererPipes, false);
+        if (child.isSimple)
+        {
+            collectAllRenderablesSimpleSingle(child, instructionSet, rendererPipes);
+        }
+        else
+        {
+            collectAllRenderablesAdvancedSingle(child, instructionSet, rendererPipes, false);
+        }
     }
 }
 
-function collectAllRenderablesSimple(
+function collectAllRenderablesSimpleSingle(
     container: Container,
     instructionSet: InstructionSet,
     renderPipes: RenderPipes
@@ -73,17 +101,6 @@ function collectAllRenderablesSimple(
         const rp = renderPipes as unknown as Record<string, RenderPipe>;
 
         rp[container.renderPipeId].addRenderable(container as Renderable, instructionSet);
-    }
-
-    if (!container.isRenderGroupRoot)
-    {
-        const children = container.children;
-        const length = children.length;
-
-        for (let i = 0; i < length; i++)
-        {
-            collectAllRenderables(children[i], instructionSet, renderPipes);
-        }
     }
 }
 
@@ -129,6 +146,51 @@ function collectAllRenderablesAdvanced(
             {
                 collectAllRenderables(children[i], instructionSet, renderPipes);
             }
+        }
+
+        // loop backwards through effects
+        for (let i = container.effects.length - 1; i >= 0; i--)
+        {
+            const effect = container.effects[i];
+            const pipe = renderPipes[effect.pipe as keyof RenderPipes]as InstructionPipe<any>;
+
+            pipe.pop(effect, container, instructionSet);
+        }
+    }
+}
+
+function collectAllRenderablesAdvancedSingle(
+    container: Container,
+    instructionSet: InstructionSet,
+    renderPipes: RenderPipes,
+    isRoot: boolean
+): void
+{
+    if (!isRoot && container.isRenderGroupRoot)
+    {
+        renderPipes.renderGroup.addRenderGroup(container.renderGroup, instructionSet);
+    }
+    else
+    {
+        for (let i = 0; i < container.effects.length; i++)
+        {
+            const effect = container.effects[i];
+            const pipe = renderPipes[effect.pipe as keyof RenderPipes]as InstructionPipe<any>;
+
+            pipe.push(effect, container, instructionSet);
+        }
+
+        const renderPipeId = container.renderPipeId;
+
+        if (renderPipeId)
+        {
+            // TODO add blends in
+            renderPipes.blendMode.setBlendMode(container as Renderable, container.groupBlendMode, instructionSet);
+            container.didViewUpdate = false;
+
+            const pipe = renderPipes[renderPipeId as keyof RenderPipes]as RenderPipe<any>;
+
+            pipe.addRenderable(container, instructionSet);
         }
 
         // loop backwards through effects
