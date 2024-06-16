@@ -38,7 +38,7 @@ function generateSampleSrc(maxTextures: number): string
 
     if (maxTextures === 1)
     {
-        src.push('outColor = textureSampleGrad(textureSource1, textureSampler1, vUV, uvDx, uvDy);');
+        src.push('outColor = textureSampleGrad(textureSource1, textureSampler1, coord, uvDx, uvDy);');
     }
     else
     {
@@ -54,7 +54,8 @@ function generateSampleSrc(maxTextures: number): string
             {
                 src.push(`  case ${i}:{`);
             }
-            src.push(`      outColor = textureSampleGrad(textureSource${i + 1}, textureSampler${i + 1}, vUV, uvDx, uvDy);`);
+            // eslint-disable-next-line max-len
+            src.push(`      outColor = textureSampleGrad(textureSource${i + 1}, textureSampler${i + 1}, coord, uvDx, uvDy);`);
             src.push(`      break;}`);
         }
 
@@ -73,10 +74,13 @@ export function generateTextureBatchBit(maxTextures: number): HighShaderBit
             vertex: {
                 header: `
                 @in aTextureIdAndRound: vec2<u32>;
+                @in aWClampFrame: vec4f;
                 @out @interpolate(flat) vTextureId : u32;
+                @out @interpolate(flat) vClampFrame : vec4f;
             `,
                 main: `
                 vTextureId = aTextureIdAndRound.y;
+                vClampFrame = aWClampFrame;
             `,
                 end: `
                 if(aTextureIdAndRound.x == 1)
@@ -88,12 +92,18 @@ export function generateTextureBatchBit(maxTextures: number): HighShaderBit
             fragment: {
                 header: `
                 @in @interpolate(flat) vTextureId: u32;
+                @in @interpolate(flat) vClampFrame: vec4f;
     
                 ${generateBindingSrc(maxRecommendedTextures())}
             `,
                 main: `
                 var uvDx = dpdx(vUV);
                 var uvDy = dpdy(vUV);
+
+                var coord = vUV;
+                if (vClampFrame.z != 0.0 && vClampFrame.w != 0.0) {
+                    coord = clamp(vUV, vClampFrame.xy, vClampFrame.zw);
+                }
     
                 ${generateSampleSrc(maxRecommendedTextures())}
             `
@@ -128,7 +138,7 @@ function generateSampleGlSrc(maxTextures: number): string
         }
 
         src.push('{');
-        src.push(`\toutColor = texture(uTextures[${i}], vUV);`);
+        src.push(`\toutColor = texture(uTextures[${i}], coord);`);
         src.push('}');
     }
 
@@ -143,29 +153,36 @@ export function generateTextureBatchBitGl(maxTextures: number): HighShaderBit
             name: 'texture-batch-bit',
             vertex: {
                 header: `
-                in vec2 aTextureIdAndRound;
+                in vec2 aTextureIdAndRound;                
                 out float vTextureId;
+                
+                in vec4 aWClampFrame;
+                out vec4 vClampFrame;
               
             `,
                 main: `
                 vTextureId = aTextureIdAndRound.y;
+                vClampFrame = aWClampFrame;
             `,
                 end: `
                 if(aTextureIdAndRound.x == 1.)
                 {
                     gl_Position.xy = roundPixels(gl_Position.xy, uResolution);
-                }
+                }                                
             `
             },
             fragment: {
                 header: `
                 in float vTextureId;
-    
+                in vec4 vClampFrame;
                 uniform sampler2D uTextures[${maxTextures}];
               
             `,
                 main: `
-    
+                vec2 coord = vUV;
+                if (vClampFrame.z != 0.0 && vClampFrame.w != 0.0) {
+                    coord = clamp(vUV, vClampFrame.xy, vClampFrame.zw);
+                }
                 ${generateSampleGlSrc(maxRecommendedTextures())}
             `
             }
