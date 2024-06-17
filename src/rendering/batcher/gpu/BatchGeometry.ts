@@ -9,7 +9,7 @@ export class BatchGeometry extends Geometry
 {
     constructor()
     {
-        const vertexSize = 10;
+        const vertexSize = 11;
 
         const attributeBuffer = new Buffer({
             data: placeHolderBufferData,
@@ -57,12 +57,19 @@ export class BatchGeometry extends Geometry
                     offset: 5 * 4,
                     location: 2,
                 },
+                aUseClamp: {
+                    buffer: attributeBuffer,
+                    format: 'float32',
+                    stride,
+                    offset: 6 * 4,
+                    location: 4,
+                },
                 aWClampFrame: {
                     buffer: attributeBuffer,
                     format: 'float32x4',
                     stride,
-                    offset: 6 * 4,
-                    location: 4,
+                    offset: 7 * 4,
+                    location: 5,
                 },
             },
             indexBuffer

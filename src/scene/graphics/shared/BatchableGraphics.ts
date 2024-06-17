@@ -96,8 +96,9 @@ export class BatchableGraphics implements BatchableObject
 
                 uint32View[index + 4] = argb;
                 uint32View[index + 5] = textureIdAndRound;
+                float32View[index + 6] = 0;
 
-                index += 10;
+                index += 11;
             }
         }
         else
@@ -114,8 +115,9 @@ export class BatchableGraphics implements BatchableObject
 
                 uint32View[index + 4] = argb;
                 uint32View[index + 5] = textureId << 16;
+                float32View[index + 6] = 0;
 
-                index += 10;
+                index += 11;
             }
         }
     }

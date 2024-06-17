@@ -109,8 +109,9 @@ export class BatchableMesh implements BatchableObject
 
             uint32View[index + 4] = abgr;
             uint32View[index + 5] = textureIdAndRound;
+            float32View[index + 6] = 0;
 
-            index += 6;
+            index += 11;
         }
     }
 

@@ -126,7 +126,7 @@ export class Batcher
     public batches: Batch[] = [];
 
     // specifics.
-    private readonly _vertexSize: number = 10;
+    private readonly _vertexSize: number = 11;
 
     private _elements: BatchableObject[] = [];
 

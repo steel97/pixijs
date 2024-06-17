@@ -74,12 +74,15 @@ export function generateTextureBatchBit(maxTextures: number): HighShaderBit
             vertex: {
                 header: `
                 @in aTextureIdAndRound: vec2<u32>;
+                @in aUseClamp: f32;
                 @in aWClampFrame: vec4f;
                 @out @interpolate(flat) vTextureId : u32;
+                @out @interpolate(flat) vUseClamp : f32;
                 @out @interpolate(flat) vClampFrame : vec4f;
             `,
                 main: `
                 vTextureId = aTextureIdAndRound.y;
+                vUseClamp = aUseClamp;
                 vClampFrame = aWClampFrame;
             `,
                 end: `
@@ -92,6 +95,7 @@ export function generateTextureBatchBit(maxTextures: number): HighShaderBit
             fragment: {
                 header: `
                 @in @interpolate(flat) vTextureId: u32;
+                @in @interpolate(flat) vUseClamp : f32;
                 @in @interpolate(flat) vClampFrame: vec4f;
     
                 ${generateBindingSrc(maxRecommendedTextures())}
@@ -101,7 +105,7 @@ export function generateTextureBatchBit(maxTextures: number): HighShaderBit
                 var uvDy = dpdy(vUV);
 
                 var coord = vUV;
-                if (vClampFrame.z != 0.0 && vClampFrame.w != 0.0) {
+                if (vUseClamp > 0.5) {
                     coord = clamp(vUV, vClampFrame.xy, vClampFrame.zw);
                 }
     
@@ -153,15 +157,17 @@ export function generateTextureBatchBitGl(maxTextures: number): HighShaderBit
             name: 'texture-batch-bit',
             vertex: {
                 header: `
-                in vec2 aTextureIdAndRound;                
-                out float vTextureId;
-                
+                in vec2 aTextureIdAndRound;
+                in float aUseClamp;
                 in vec4 aWClampFrame;
+                out float vTextureId;
+                out float vUseClamp;
                 out vec4 vClampFrame;
               
             `,
                 main: `
                 vTextureId = aTextureIdAndRound.y;
+                vUseClamp = aUseClamp;
                 vClampFrame = aWClampFrame;
             `,
                 end: `
@@ -174,13 +180,14 @@ export function generateTextureBatchBitGl(maxTextures: number): HighShaderBit
             fragment: {
                 header: `
                 in float vTextureId;
+                in float vUseClamp;
                 in vec4 vClampFrame;
                 uniform sampler2D uTextures[${maxTextures}];
               
             `,
                 main: `
                 vec2 coord = vUV;
-                if (vClampFrame.z != 0.0 && vClampFrame.w != 0.0) {
+                if (vUseClamp > 0.5) {
                     coord = clamp(vUV, vClampFrame.xy, vClampFrame.zw);
                 }
                 ${generateSampleGlSrc(maxRecommendedTextures())}

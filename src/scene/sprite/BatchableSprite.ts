@@ -69,40 +69,44 @@ export class BatchableSprite implements BatchableObject
 
         uint32View[index + 4] = argb;
         uint32View[index + 5] = textureIdAndRound;
-        this._addClamp(texture.textureMatrix.uClampFrame, index + 6, float32View);
+        float32View[index + 6] = 1; // use clamp flag
+        this._addClamp(texture.textureMatrix.uClampFrame, index + 7, float32View);
 
         // xy
-        float32View[index + 10] = (a * w0) + (c * h1) + tx;
-        float32View[index + 11] = (d * h1) + (b * w0) + ty;
+        float32View[index + 11] = (a * w0) + (c * h1) + tx;
+        float32View[index + 12] = (d * h1) + (b * w0) + ty;
 
-        float32View[index + 12] = uvs.x1;
-        float32View[index + 13] = uvs.y1;
+        float32View[index + 13] = uvs.x1;
+        float32View[index + 14] = uvs.y1;
 
-        uint32View[index + 14] = argb;
-        uint32View[index + 15] = textureIdAndRound;
-        this._addClamp(texture.textureMatrix.uClampFrame, index + 16, float32View);
-
-        // xy
-        float32View[index + 20] = (a * w0) + (c * h0) + tx;
-        float32View[index + 21] = (d * h0) + (b * w0) + ty;
-
-        float32View[index + 22] = uvs.x2;
-        float32View[index + 23] = uvs.y2;
-
-        uint32View[index + 24] = argb;
-        uint32View[index + 25] = textureIdAndRound;
-        this._addClamp(texture.textureMatrix.uClampFrame, index + 26, float32View);
+        uint32View[index + 15] = argb;
+        uint32View[index + 16] = textureIdAndRound;
+        float32View[index + 17] = 1;
+        this._addClamp(texture.textureMatrix.uClampFrame, index + 18, float32View);
 
         // xy
-        float32View[index + 30] = (a * w1) + (c * h0) + tx;
-        float32View[index + 31] = (d * h0) + (b * w1) + ty;
+        float32View[index + 22] = (a * w0) + (c * h0) + tx;
+        float32View[index + 23] = (d * h0) + (b * w0) + ty;
 
-        float32View[index + 32] = uvs.x3;
-        float32View[index + 33] = uvs.y3;
+        float32View[index + 24] = uvs.x2;
+        float32View[index + 25] = uvs.y2;
 
-        uint32View[index + 34] = argb;
-        uint32View[index + 35] = textureIdAndRound;
-        this._addClamp(texture.textureMatrix.uClampFrame, index + 36, float32View);
+        uint32View[index + 26] = argb;
+        uint32View[index + 27] = textureIdAndRound;
+        float32View[index + 28] = 1;
+        this._addClamp(texture.textureMatrix.uClampFrame, index + 29, float32View);
+
+        // xy
+        float32View[index + 33] = (a * w1) + (c * h0) + tx;
+        float32View[index + 34] = (d * h0) + (b * w1) + ty;
+
+        float32View[index + 35] = uvs.x3;
+        float32View[index + 36] = uvs.y3;
+
+        uint32View[index + 37] = argb;
+        uint32View[index + 38] = textureIdAndRound;
+        float32View[index + 39] = 1;
+        this._addClamp(texture.textureMatrix.uClampFrame, index + 40, float32View);
     }
 
     private _addClamp(clamp: Float32Array, index: number, float32View: Float32Array)
